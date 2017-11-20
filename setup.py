@@ -8,4 +8,6 @@ setup(name='collectd-facter',
       author='Gary Hetzel',
       author_email='garyhetzel@gmail.com',
       url='http://github.com/ghetzel/collectd-facter/',
+      license='MIT',
+      keywords=['facter','collectd','puppet'],
       packages=['collectd_facter'])
