@@ -18,9 +18,10 @@ import subprocess
 #   processes the collectd.conf configuration stanza for this plugin
 #
 def config(c):
-  global facterbin, facts, config
+  global defaultfloat, metadata, facterbin, facts, config
   facterbin = 'facter'
   facts = {}
+  metadata = False
 
   for ci in c.children:
     if ci.key == 'FactFile':
@@ -55,7 +56,14 @@ def config(c):
     elif ci.key == 'Facter':
        facterbin = ci.values[0]
 
+    elif ci.key == 'MetaData':
+       if ci.values[0] == 'True':
+          metadata = True
 
+    elif ci.key == 'DefaultFloat':
+       defaultfloat = ci.values[0]
+
+  collectd.info("collectd_facter: List of facts to collect is %s" % ', '.join(facts.keys()))
 
 # -----------------------------------------------------------------------------
 # CALLBACK: collectd write()
@@ -83,13 +91,22 @@ stdout=subprocess.PIPE, env=env)
         if fact in values:
           try:
             value = float(values[fact])
+          except ValueError, e:
+            try:
+              defaultfloat
+              value = defaultfloat
+            except NameError, e:
+              pass
+          try:
+            value
             vl.plugin_instance = facts[fact]
+            if metadata == True:
+              vl.meta = {'value': values[fact]}
             vl.dispatch(values=[value])
-          except Exception, e:
+          except NameError, e:
             pass
-
-  except Exception, e:
-    pass
+  except ValueError, e:
+    collectd.error('collectd_facter: Facter\'s json could not be parsed: %s' % e)
 
 # -----------------------------------------------------------------------------
 # shutdown
