@@ -55,6 +55,14 @@ def config(c):
     elif ci.key == 'Facter':
        facterbin = ci.values[0]
 
+    elif ci.key == 'Interval':
+       interval = int(ci.values[0])
+
+  try:
+    interval
+    collectd.register_read(read,interval)
+  except NameError, e:
+    collectd.register_read(read)
 
 
 # -----------------------------------------------------------------------------
@@ -103,6 +111,5 @@ def shutdown():
 # Register Callbacks
 # -----------------------------------------------------------------------------
 collectd.register_config(config)
-collectd.register_read(read)
 collectd.register_shutdown(shutdown)
 

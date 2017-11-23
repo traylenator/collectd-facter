@@ -13,6 +13,7 @@
     Fact "uptime_seconds" "uptime"
     FactFile "/etc/collectd-facter.list"
     Facter "/opt/puppetlabs/puppet/bin/facter"
+    Interval 1000
   </Module>
 </Plugin>
 
